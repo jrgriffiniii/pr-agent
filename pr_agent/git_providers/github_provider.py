@@ -1,4 +1,5 @@
 import hashlib
+import os
 from datetime import datetime
 from typing import Optional, Tuple
 from urllib.parse import urlparse
@@ -343,7 +344,9 @@ class GithubProvider(GitProvider):
 
         if deployment_type == 'app':
             try:
+                # private_key = os.environ.get('GITHUB.PRIVATE_KEY')
                 private_key = get_settings().github.private_key
+                # app_id = os.environ.get('GITHUB.APP_ID')
                 app_id = get_settings().github.app_id
             except AttributeError as e:
                 raise ValueError("GitHub app ID and private key are required when using GitHub app deployment") from e

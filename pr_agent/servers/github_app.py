@@ -53,6 +53,7 @@ async def get_body(request):
     except Exception as e:
         get_logger().error("Error parsing request body", e)
         raise HTTPException(status_code=400, detail="Error parsing request body") from e
+    # webhook_secret = os.environ.get('GITHUB.WEBHOOK_SECRET')
     webhook_secret = getattr(get_settings().github, 'webhook_secret', None)
     if webhook_secret:
         body_bytes = await request.body()
@@ -172,6 +173,26 @@ def start():
         # Override the deployment type to app
         get_settings().set("GITHUB.DEPLOYMENT_TYPE", "app")
     get_settings().set("CONFIG.PUBLISH_OUTPUT_PROGRESS", False)
+
+    # OpenAI env variables
+    OPENAI_KEY = os.environ.get("OPENAI.KEY")
+    if OPENAI_KEY:
+        get_settings().set("openai.key", OPENAI_KEY)
+    OPENAI_ORG = os.environ.get("OPENAI.ORG")
+    if OPENAI_ORG:
+        get_settings().set("openai.org", OPENAI_ORG)
+
+    # GitHub env variables
+    PRIVATE_KEY = os.environ.get("GITHUB.PRIVATE_KEY")
+    if PRIVATE_KEY:
+        get_settings().set("github.private_key", PRIVATE_KEY)
+    APP_ID = os.environ.get("GITHUB.APP_ID")
+    if APP_ID:
+        get_settings().set("github.app_id", APP_ID)
+    WEBHOOK_SECRET = os.environ.get('GITHUB.WEBHOOK_SECRET')
+    if WEBHOOK_SECRET:
+        get_settings().set("github.webhook_secret", WEBHOOK_SECRET)
+
     middleware = [Middleware(RawContextMiddleware)]
     app = FastAPI(middleware=middleware)
     app.include_router(router)
